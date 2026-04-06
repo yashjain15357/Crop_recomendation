@@ -29,7 +29,7 @@ def predict_crop(input_data):
     return crop_name
 
 
-@application.route("/", methods=['GET', 'POST'])
+@app.route("/", methods=['GET', 'POST'])
 def predict():
     
     if request.method == 'POST':
@@ -52,14 +52,14 @@ def predict():
             'rainfall': rainfall
         }
 
-        crop_name = predict_crop(input_data)
+        crop_name = predict_crop(input_data).upper()
         
         return render_template('home.html', results=crop_name)
     else:
         return render_template('home.html')
 
 
-@application.route("/api/predict", methods=['GET', 'POST'])
+@app.route("/api/predict", methods=['GET', 'POST'])
 def predict_api():
     """JSON API: takes input features and returns input + predicted crop."""
     
@@ -104,4 +104,4 @@ def predict_api():
         
 
 if __name__ == "__main__":
-    application.run(debug=True)
+    app.run(debug=True)
