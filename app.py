@@ -8,8 +8,8 @@ from flask import Flask, request, render_template, jsonify
 xgboost_model = pickle.load(open("model_file/xgboost_crop_model.pkl", 'rb'))
 label_encoder = pickle.load(open("model_file/label_encoder.pkl", 'rb'))
 
-application = Flask(__name__)
-app = application
+app = Flask(__name__)
+
 
 
 def predict_crop(input_data):
