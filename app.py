@@ -11,7 +11,6 @@ label_encoder = pickle.load(open("model_file/label_encoder.pkl", 'rb'))
 app = Flask(__name__)
 
 
-
 def predict_crop(input_data):
     """Predict crop name from ordered input dict."""
     new_data = np.array([[ 
@@ -29,9 +28,14 @@ def predict_crop(input_data):
     return crop_name
 
 
+@app.route('/ping', methods=['GET'])
+def ping():
+    """Lightweight endpoint for keep-alive cron jobs / uptime monitors."""
+    return jsonify({'status': 'alive'}), 200
+
+
 @app.route("/", methods=['GET', 'POST'])
 def predict():
-    
     if request.method == 'POST':
         # Get input values from the form (7 features for crop recommendation)
         N = float(request.form.get('N'))
@@ -62,8 +66,6 @@ def predict():
 @app.route("/api/predict", methods=['GET', 'POST'])
 def predict_api():
     """JSON API: takes input features and returns input + predicted crop."""
-    
-    # Handle POST request - make prediction
     try:
         data = request.get_json(force=True)
 
@@ -101,7 +103,7 @@ def predict_api():
             'status': 'error',
             'message': str(e)
         }), 500
-        
+
 
 if __name__ == "__main__":
     app.run(debug=True)
