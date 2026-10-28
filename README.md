@@ -67,7 +67,7 @@ python application.py
 
 The app starts in debug mode and is typically available at:
 
-- http://127.0.0.1:5000/
+- https://crop-recomendation-4r7z.onrender.com/
 
 ## API Usage
 
