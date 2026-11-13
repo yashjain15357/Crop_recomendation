@@ -65,27 +65,44 @@ def predict():
 
 @app.route("/api/predict", methods=['GET', 'POST'])
 def predict_api():
-    """JSON API: takes input features and returns input + predicted crop."""
+    """JSON/API endpoint: accepts JSON/form/query input and returns recommended crop."""
     try:
-        data = request.get_json(force=True)
+        data = request.get_json(silent=True)
+
+        if data is None:
+            data = request.form.to_dict()
+        if not data:
+            data = request.args.to_dict()
+
+        if not isinstance(data, dict):
+            return jsonify({
+                'status': 'error',
+                'message': 'Request body must be a JSON object, form data, or query parameters'
+            }), 400
 
         required_fields = ['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall']
-        missing_fields = [field for field in required_fields if field not in data]
+        missing_fields = [field for field in required_fields if field not in data or data[field] in [None, '']]
 
         if missing_fields:
             return jsonify({
                 'status': 'error',
-                'message': f"Missing fields: {', '.join(missing_fields)}"
+                'message': f"Missing or empty fields: {', '.join(missing_fields)}"
             }), 400
 
+        def to_float(value, field_name):
+            try:
+                return float(value)
+            except (TypeError, ValueError):
+                raise ValueError(f"Field '{field_name}' must be a valid number")
+
         input_data = {
-            'N': float(data['N']),
-            'P': float(data['P']),
-            'K': float(data['K']),
-            'temperature': float(data['temperature']),
-            'humidity': float(data['humidity']),
-            'ph': float(data['ph']),
-            'rainfall': float(data['rainfall'])
+            'N': to_float(data['N'], 'N'),
+            'P': to_float(data['P'], 'P'),
+            'K': to_float(data['K'], 'K'),
+            'temperature': to_float(data['temperature'], 'temperature'),
+            'humidity': to_float(data['humidity'], 'humidity'),
+            'ph': to_float(data['ph'], 'ph'),
+            'rainfall': to_float(data['rainfall'], 'rainfall')
         }
 
         crop_name = predict_crop(input_data)
@@ -98,6 +115,11 @@ def predict_api():
             }
         }), 200
 
+    except ValueError as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        }), 400
     except Exception as e:
         return jsonify({
             'status': 'error',
