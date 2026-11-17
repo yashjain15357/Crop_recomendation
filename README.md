@@ -2,6 +2,10 @@
 
 A Flask-based machine learning web application that recommends the most suitable crop based on soil nutrients and weather conditions.
 
+The app starts in debug mode and is typically available at:
+
+- https://crop-recomendation-4r7z.onrender.com/
+
 ## Features
 
 - Web form UI for crop prediction
